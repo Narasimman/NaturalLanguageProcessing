@@ -1,41 +1,38 @@
-import re
+from parseinput import *
+from collections import defaultdict
 
-_re_nonAlpha = re.compile("[^A-Za-z0-9_/ \t]")
+class Viterbi:
+  def __init__(self, lexicon, tags):
+    self.tags = ['<START>', '</START>'] + tags
+    self.trans_count = []
+    self.emit_count  = {}
+    self.tag_index = {}
 
-def readTrainingData(filepath):
-  sentences = []
-  lexicon   = {}
-  tags      = {}
-  sentence  = []
-  tData = open(filepath)
-  for line in tData:
+    i = 0
+    for tag in self.tags:
+      self.tag_index[tag] = i
+      i = i + 1
+    for tag in self.tags:
+      self.trans_count.append([0] * len(self.tags))
+      self.emit_count[self.tag_index[tag]] = dict()
 
-    line = _re_nonAlpha.sub("", line)
-    
-    line.strip()
-    line.lower()
-    if len(line.strip()) == 0:
-      if len(sentence) > 0:
-        sentences.append(sentence)
-      sentence = []   
-    else:
-      pair = line.split("\t")
-      if len(pair) == 2:
-        word = pair[0].strip()
-        pos  = pair[1].strip()
+  def calc_p(self, sentences):
+    for sentence in sentences:
+      prev = self.tag_index['<START>']
+      for pair in sentence:
+        word = pair[0]
+        state  = self.tag_index[pair[1]]
+        self.trans_count[prev][state] += 1
+        
+        counter = 0
+        
+        d = self.emit_count[state];
+        d[word] = d.get(word, 0) + 1
 
-        lexicon[word] = 0
-        tags[pos] = 0
-
-        sentence.append((word,pos))
-  if len(sentence) > 0:
-    sentences.append(sentence)
-
-  tData.close()
-  return sentences, lexicon.keys(),tags.keys()
-
-
+        prev = state
 
 if __name__ == "__main__":
   sentences, lexicon, tags = readTrainingData("data/WSJ_02-21.pos")
-  print tags
+  model = Viterbi(lexicon, tags)
+  model.calc_p(sentences)
+  print len(model.trans_count)
