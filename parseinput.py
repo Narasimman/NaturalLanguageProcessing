@@ -8,9 +8,7 @@ def readTrainingData(filepath):
   tags      = {}
   sentence  = []
   tData = open(filepath, 'r')
-  for line in tData:
-
-    
+  for line in tData:    
     line.strip()
     line.lower()
     if len(line.strip()) == 0:
@@ -33,8 +31,6 @@ def readTrainingData(filepath):
 
   tData.close()
   return sentences, lexicon.keys(),tags.keys()
-
-
 
 if __name__ == "__main__":
   sentences, lexicon, tags = readTrainingData("data/WSJ_02-21.pos")

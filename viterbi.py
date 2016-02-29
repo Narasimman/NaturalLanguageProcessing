@@ -4,7 +4,7 @@ import numpy as np
 
 class Viterbi:
   def __init__(self, lexicon, tags):
-    self.tags = ['<START>', '</START>'] + tags #adding start and end tags
+    self.tags = ['<START>', '<END>'] + tags #adding start and end tags
     self.trans_count = [] #count of arcs from s0 to s1
     self.emit_count  = {} #count of emission of words in state s1
     self.state_count = [0]*len(self.tags) #count of words in state s
@@ -41,6 +41,11 @@ class Viterbi:
         self.state_count[state] += 1
         prev = state
 
+      #handle end state transition
+      end = self.tag_index['<END>']
+      self.state_count[end] += 1
+      self.trans_count[prev][end] += 1
+
   def calculateProb(self):
     for i in range(len(self.trans_count)):
       for j in range(len(self.trans_count[i])):
@@ -62,7 +67,9 @@ class Viterbi:
 
     #viterbi table
     vt = np.zeros((N,T))
-
+    bt = {}
+    
+    #for initialization - start tags
     start = self.tag_index['<START>']
     for tag in self.tags:
       ti = self.tag_index[tag]
@@ -70,7 +77,9 @@ class Viterbi:
         vt[0][ti] = self.tp[start][ti] * self.ep[ti][sentence[0]]
       except:
         vt[0][ti] = 0.0001
+      bt[(0,tag)] = 0
 
+    #Iteratively calculate for time 1 to N
     for i in xrange(1, N):
       for tag in self.tags:
         tag_id  = self.tag_index[tag]
@@ -81,13 +90,29 @@ class Viterbi:
         try:
           vt[i][tag_id] = max(prev_vt.values()) * self.ep[tag_id][sentence[i]]
         except:
-          vt[i][tag_id] = 0.0001
-
-    print vt
+          vt[i][tag_id] = 0.0
+        bt[(i,tag)] = max(prev_vt, key=prev_vt.get)
+    
+    prev_vt = {}
+    #termination step
+    for prev in self.tags:
+      prev_id = self.tag_index[prev]
+      prev_vt[(N-1, prev)] = vt[N-1][prev_id] * self.tp[prev_id][self.tag_index['<END>']]
+    bt[(N, "<END>")] = max(prev_vt, key=prev_vt.get)
+                                
+    sequence = []
+    pointer = bt[(N, "<END>")]
+    while pointer != 0:
+      sequence.append(pointer[1])
+      pointer = bt[pointer]
+    sequence.reverse()
+    return [(sentence[i],sequence[i]) for i in xrange(0, len(sentence))]
 
 if __name__ == "__main__":
   sentences, lexicon, tags = readTrainingData("data/WSJ_02-21.pos")
   model = Viterbi(lexicon, tags)
   model.getCounts(sentences)
   model.calculateProb()
-  model.decode(['the','most','troublesome','report','may','be','','the','August','merchandise','trade','deficit','due','out','tomorrow'])
+
+  result = model.decode(['the','most','troublesome','report','may','be','the','August','merchandise','trade','deficit','due','out','tomorrow'])
+  print result
