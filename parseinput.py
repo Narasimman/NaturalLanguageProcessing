@@ -1,6 +1,6 @@
 import re
 
-_re_nonAlpha = re.compile("[^A-Za-z0-9_/ \t]")
+#_re_nonAlpha = re.compile("[^A-Za-z0-9_/ \t]")
 
 def readTrainingData(filepath):
   sentences = []
@@ -16,7 +16,7 @@ def readTrainingData(filepath):
         sentences.append(sentence)
       sentence = []   
     else:
-      line = _re_nonAlpha.sub("", line)
+      #line = _re_nonAlpha.sub("", line)
       pair = line.split("\t")
       if len(pair) == 2:
         word = pair[0].strip()

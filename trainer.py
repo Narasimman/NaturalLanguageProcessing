@@ -1,7 +1,7 @@
 from parseinput import *
 from viterbi import *
 
-_re_nonAlpha = re.compile("[^A-Za-z0-9_/ \t]")
+#_re_nonAlpha = re.compile("[^A-Za-z0-9_/ \t]")
 
 def readTestCorpus(filepath):
   sentences = []
@@ -16,8 +16,8 @@ def readTestCorpus(filepath):
         sentences.append(sentence)
         sentence = []
     else:
-      line = _re_nonAlpha.sub("", line)
-      word = line
+      #line = _re_nonAlpha.sub("", line)
+      word = line.strip()
       if len(word) > 0:
         sentence.append(word)
   if len(sentence) > 0:
@@ -34,12 +34,13 @@ if __name__ == "__main__":
 
   sentences = readTestCorpus("data/WSJ_24.words")
   
-  outfile = open("out", 'rw+')
+  outfile = open("WSJ_24.pos", 'rw')
 
   for sentence in sentences:
     result = model.decode(sentence)
     for pair in result:
-      outfile.write(pair[0] + "\t" + pair[1])
+      outfile.write(pair[0] + "\t" + pair[1] + "\n")
+    outfile.write("\n")  
 
   outfile.close()    
   

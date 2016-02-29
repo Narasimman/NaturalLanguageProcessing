@@ -114,5 +114,5 @@ if __name__ == "__main__":
   model.getCounts(sentences)
   model.calculateProb()
 
-  result = model.decode(['the','most','troublesome','report','may','be','the','August','merchandise','trade','deficit','due','out','tomorrow'])
+  result = model.decode(['The','most','troublesome','report','may','be','the','August','merchandise','trade','deficit','due',',','out','tomorrow','.'])
   print result
