@@ -48,4 +48,4 @@ def score (keyFileName, responseFileName):
 	print str(correct) + " out of " + str(correct + incorrect) + " tags correct"
 	accuracy = 100.0 * correct / (correct + incorrect)
 	print "  accuracy: %f" % accuracy
-score ('data/WSJ_24.pos','out')
+score ('data/WSJ_24.pos','WSJ_24.pos')

@@ -34,7 +34,7 @@ if __name__ == "__main__":
 
   sentences = readTestCorpus("data/WSJ_24.words")
   
-  outfile = open("WSJ_24.pos", 'rw')
+  outfile = open("WSJ_24.pos", 'rw+')
 
   for sentence in sentences:
     result = model.decode(sentence)
