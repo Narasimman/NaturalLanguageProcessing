@@ -47,19 +47,20 @@ class Viterbi:
       self.trans_count[prev][end] += 1
 
   def calculateProb(self):
+    smoothingfactor = 0.0001
     for i in range(len(self.trans_count)):
       for j in range(len(self.trans_count[i])):
         try:
           self.tp[i][j] = float(self.trans_count[i][j])/float(self.state_count[i])
         except:
-          self.tp[i][j] = 0.0001
+          self.tp[i][j] = smoothingfactor/float(self.state_count[i])
 
     for i in range(len(self.emit_count)):
       for word in self.emit_count[i].keys():
         try:
           self.ep[i][word] = float(self.emit_count[i][word])/float(self.state_count[i])
         except:
-          self.ep[i][word] = 0.0001
+          self.ep[i][word] = smoothingfactor/float(self.state_count[i])
 
   def decode(self, sentence):
     N = len(sentence)
@@ -76,7 +77,7 @@ class Viterbi:
       try:
         vt[0][ti] = self.tp[start][ti] * self.ep[ti][sentence[0]]
       except:
-        vt[0][ti] = 0.0001
+        vt[0][ti] = 0.0
       bt[(0,tag)] = 0
 
     #Iteratively calculate for time 1 to N
@@ -108,11 +109,3 @@ class Viterbi:
     sequence.reverse()
     return [(sentence[i],sequence[i]) for i in xrange(0, len(sentence))]
 
-if __name__ == "__main__":
-  sentences, lexicon, tags = readTrainingData("data/WSJ_02-21.pos")
-  model = Viterbi(lexicon, tags)
-  model.getCounts(sentences)
-  model.calculateProb()
-
-  result = model.decode(['The','most','troublesome','report','may','be','the','August','merchandise','trade','deficit','due',',','out','tomorrow','.'])
-  print result
