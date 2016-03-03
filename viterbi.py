@@ -1,6 +1,7 @@
 from parseinput import *
 from collections import defaultdict
 import numpy as np
+import math
 
 class Viterbi:
   def __init__(self, lexicon, tags):
@@ -9,10 +10,10 @@ class Viterbi:
     self.emit_count  = {} #count of emission of words in state s1
     self.state_count = [0]*len(self.tags) #count of words in state s
     self.tag_index = {}
+    self.wordToTags = {}
 
     self.tp = []
     self.ep = {}
-
     i = 0
     for tag in self.tags:
       self.tag_index[tag] = i
@@ -29,22 +30,26 @@ class Viterbi:
   #calculate the counts for all states and words(useful to calculate tp and ep)
   def getCounts(self, sentences):
     for sentence in sentences:
-      prev = self.tag_index['<START>']
-      self.state_count[prev] += 1
-      for pair in sentence:
-        word = pair[0]
-        state  = self.tag_index[pair[1]]
-        self.trans_count[prev][state] += 1
+      sentence = [('<START>', '<START>')] + sentence + [('<END>', '<END>')]
+      for i in range(len(sentence) - 1):
+        word, tag_c = sentence[i]
+        state = self.tag_index[tag_c]
         
+        if word in self.wordToTags:
+          self.wordToTags[word].add(tag_c)
+        else:
+          self.wordToTags[word] = set()
+          self.wordToTags[word].add(tag_c)
+
+        word_n, tag_n = sentence[i+1]
+        n_state = self.tag_index[tag_n]
+
+        self.trans_count[state][n_state] += 1
+
         d = self.emit_count[state];
         self.emit_count[state][word] = d.get(word, 0) + 1
         self.state_count[state] += 1
-        prev = state
 
-      #handle end state transition
-      end = self.tag_index['<END>']
-      self.state_count[end] += 1
-      self.trans_count[prev][end] += 1
 
   def calculateProb(self):
     smoothingfactor = 0.0001
@@ -53,23 +58,25 @@ class Viterbi:
         try:
           self.tp[i][j] = float(self.trans_count[i][j])/float(self.state_count[i])
         except:
-          self.tp[i][j] = smoothingfactor/float(self.state_count[i])
+          self.tp[i][j] = 0.0
 
     for i in range(len(self.emit_count)):
       for word in self.emit_count[i].keys():
         try:
           self.ep[i][word] = float(self.emit_count[i][word])/float(self.state_count[i])
         except:
-          self.ep[i][word] = smoothingfactor/float(self.state_count[i])
+          self.ep[i][word] = 0.0
 
   def decode(self, sentence):
     N = len(sentence)
+   
     T = len(self.tags)
 
     #viterbi table
     vt = np.zeros((N,T))
     bt = {}
     
+
     #for initialization - start tags
     start = self.tag_index['<START>']
     for tag in self.tags:
@@ -77,7 +84,7 @@ class Viterbi:
       try:
         vt[0][ti] = self.tp[start][ti] * self.ep[ti][sentence[0]]
       except:
-        vt[0][ti] = 0.0
+        vt[0][ti] = self.tp[start][ti] * 0.00000001
       bt[(0,tag)] = 0
 
     #Iteratively calculate for time 1 to N
@@ -88,10 +95,12 @@ class Viterbi:
         for prev in self.tags:
           prev_id = self.tag_index[prev]
           prev_vt[(i-1, prev)] = vt[i-1][prev_id] * self.tp[prev_id][tag_id]
-        try:
+          
+        try:          
           vt[i][tag_id] = max(prev_vt.values()) * self.ep[tag_id][sentence[i]]
         except:
-          vt[i][tag_id] = 0.0
+          vt[i][tag_id] = max(prev_vt.values()) *  0.00000001
+        
         bt[(i,tag)] = max(prev_vt, key=prev_vt.get)
     
     prev_vt = {}
@@ -99,13 +108,15 @@ class Viterbi:
     for prev in self.tags:
       prev_id = self.tag_index[prev]
       prev_vt[(N-1, prev)] = vt[N-1][prev_id] * self.tp[prev_id][self.tag_index['<END>']]
+
     bt[(N, "<END>")] = max(prev_vt, key=prev_vt.get)
                                 
     sequence = []
-    pointer = bt[(N, "<END>")]
-    while pointer != 0:
-      sequence.append(pointer[1])
-      pointer = bt[pointer]
+    bp = bt[(N, "<END>")]
+    while bp != 0:
+      sequence.append(bp[1])
+      bp = bt[bp]
     sequence.reverse()
     return [(sentence[i],sequence[i]) for i in xrange(0, len(sentence))]
+
 

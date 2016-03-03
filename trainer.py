@@ -1,7 +1,6 @@
 from parseinput import *
 from viterbi import *
 
-#_re_nonAlpha = re.compile("[^A-Za-z0-9_/ \t]")
 
 def readTestCorpus(filepath):
   sentences = []
@@ -9,15 +8,13 @@ def readTestCorpus(filepath):
   tData = open(filepath, 'r')
   
   for line in tData:
-    line.strip()
-    line.lower()
-    if len(line.strip()) == 0:
+    line = line.strip()
+    if len(line) == 0:
       if len(sentence) > 0:
         sentences.append(sentence)
         sentence = []
     else:
-      #line = _re_nonAlpha.sub("", line)
-      word = line.strip()
+      word = line
       if len(word) > 0:
         sentence.append(word)
   if len(sentence) > 0:
@@ -27,14 +24,14 @@ def readTestCorpus(filepath):
 
 
 if __name__ == "__main__":
-  sentences, lexicon, tags = readTrainingData("data/WSJ_02-21.pos")
+  sentences, lexicon, tags = readTrainingData("WSJ_POS_CORPUS_FOR_STUDENTS/WSJ_02-21.pos")
   model = Viterbi(lexicon, tags)
   model.getCounts(sentences)
   model.calculateProb()
 
-  sentences = readTestCorpus("data/WSJ_24.words")
+  sentences = readTestCorpus("WSJ_POS_CORPUS_FOR_STUDENTS/WSJ_23.words")
   
-  outfile = open("WSJ_24.pos", 'rw+')
+  outfile = open("WSJ_23.pos", 'w+')
 
   for sentence in sentences:
     result = model.decode(sentence)

@@ -9,9 +9,8 @@ def readTrainingData(filepath):
   sentence  = []
   tData = open(filepath, 'r')
   for line in tData:    
-    line.strip()
-    line.lower()
-    if len(line.strip()) == 0:
+    line = line.strip()
+    if len(line) == 0:
       if len(sentence) > 0:
         sentences.append(sentence)
       sentence = []   
