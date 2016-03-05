@@ -10,7 +10,6 @@ class Viterbi:
     self.emit_count  = {} #count of emission of words in state s1
     self.state_count = [0]*len(self.tags) #count of words in state s
     self.tag_index = {}
-    self.wordToTags = {}
 
     self.tp = []
     self.ep = {}
@@ -35,12 +34,6 @@ class Viterbi:
         word, tag_c = sentence[i]
         state = self.tag_index[tag_c]
         
-        if word in self.wordToTags:
-          self.wordToTags[word].add(tag_c)
-        else:
-          self.wordToTags[word] = set()
-          self.wordToTags[word].add(tag_c)
-
         word_n, tag_n = sentence[i+1]
         n_state = self.tag_index[tag_n]
 
