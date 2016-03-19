@@ -1,4 +1,5 @@
 from parseinput import *
+from featurebuilder import *
 
 def readTestCorpus(filepath):
   sentences = []
@@ -16,7 +17,7 @@ def readTestCorpus(filepath):
       word = pair[0]
       tag = pair[1]
       if len(word) > 0 and len(tag) > 0:
-        sentence.append((word,tag))
+        sentence.append((word,tag,""))
   if len(sentence) > 0:
     sentences.append(sentence)
   tData.close()
@@ -25,6 +26,13 @@ def readTestCorpus(filepath):
 
 if __name__ == "__main__":
   sentences, lexicon, tags = readTrainingData("WSJ_CHUNK_CORPUS_FOR_STUDENTS/WSJ_02-21.pos-chunk")
-  print sentences[0]
+
+  fb = FeatureBuilder(sentences)
+  fb.buildFeatureVector("WSJ_02-21.feature")
+
   sentences = readTestCorpus("WSJ_CHUNK_CORPUS_FOR_STUDENTS/WSJ_24.pos")
-  print sentences[0]
+  
+  fb = FeatureBuilder(sentences)
+  fb.buildFeatureVector("WSJ_24.feature")
+
+  

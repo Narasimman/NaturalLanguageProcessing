@@ -13,6 +13,8 @@ def score (keyFileName, responseFileName):
   responseFile = open(responseFileName, 'r')
   response = responseFile.readlines()
   if len(key) != len(response):
+    print len(key)
+    print len(response)
     print "length mismatch between key and submitted file"
     exit()
   correct = 0

@@ -4,9 +4,10 @@ class FeatureBuilder:
   def __init__(self, sentences):
     self.sentences = sentences
 
-  def buildFeatureVector(self):
-    outfile = open("test", "w+")
+  def buildFeatureVector(self, outfilename):
+    outfile = open(outfilename, "w+")
     for sentence in self.sentences:
+      outfile.write("\n")
       sentence = [('<s>', '<s>', '<s>')] + sentence + [('</s>', '</s>', '</s>')]
       if len(sentence) > 2:
         for i in range(1, len(sentence) - 1):
@@ -16,6 +17,7 @@ class FeatureBuilder:
           feature = self.computeFeature(prev, curr, next)
           outfile.write(feature + "\n")
 
+    outfile.write("\n")
     outfile.close()
 
   def isCapitalWord(self, word):
@@ -25,7 +27,7 @@ class FeatureBuilder:
       return "false"
 
   def getFeatureValue(self, word):
-    if word == '<s>' or word == '</s>':
+    if len(word) == 0 or word == '<s>' or word == '</s>':
       return '@@'
     else:
       return word
@@ -44,15 +46,17 @@ class FeatureBuilder:
     feature += "prevTag=" + self.getFeatureValue(prev[1]) + tab
     feature += "currTag=" + curr[1] + tab
     feature += "nextTag=" + self.getFeatureValue(next[1]) + tab
-    feature += "prevWord=" + prev[0] + tab
+    feature += "prevWord=" + self.getFeatureValue(prev[0]) + tab
     feature += "currWord=" + curr[0] + tab
-    feature += "nextWord=" + next[0] + tab
+    feature += "nextWord=" + self.getFeatureValue(next[0]) + tab
     feature += "isCapitalized=" + self.isCapitalWord(curr[0]) + tab
-    feature += curr[2]
+    if len(curr[2]) > 0:
+      feature += curr[2]
+
     return feature
 
 if __name__ == "__main__":
   sentences, lexicon, tags = readTrainingData("WSJ_CHUNK_CORPUS_FOR_STUDENTS/WSJ_02-21.pos-chunk")
 
   fb = FeatureBuilder(sentences)
-  fb.buildFeatureVector()
+  fb.buildFeatureVector("test")
