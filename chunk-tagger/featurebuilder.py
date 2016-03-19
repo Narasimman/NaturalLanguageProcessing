@@ -24,6 +24,12 @@ class FeatureBuilder:
     else:
       return "false"
 
+  def getFeatureValue(self, word):
+    if word == '<s>' or word == '</s>':
+      return '@@'
+    else:
+      return word
+
   def computeFeature(self, prev, curr, next):
     tab = "\t"
     feature = curr[0] + tab
@@ -33,11 +39,11 @@ class FeatureBuilder:
     else:
       feature += "firstword=false" + tab
 
-    feature += "prevNP=" + prev[2] + tab
-    feature += "nextNP=" + next[2] + tab    
-    feature += "prevTag=" + prev[1] + tab
+    feature += "prevNP=" + self.getFeatureValue(prev[2]) + tab
+    feature += "nextNP=" + self.getFeatureValue(next[2]) + tab    
+    feature += "prevTag=" + self.getFeatureValue(prev[1]) + tab
     feature += "currTag=" + curr[1] + tab
-    feature += "nextTag=" + next[1] + tab
+    feature += "nextTag=" + self.getFeatureValue(next[1]) + tab
     feature += "prevWord=" + prev[0] + tab
     feature += "currWord=" + curr[0] + tab
     feature += "nextWord=" + next[0] + tab
