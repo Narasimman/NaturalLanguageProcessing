@@ -27,11 +27,19 @@ class FeatureBuilder:
   def computeFeature(self, prev, curr, next):
     tab = "\t"
     feature = curr[0] + tab
+
+    if prev[0] == '<s>':
+      feature += "firstword=true" + tab
+    else:
+      feature += "firstword=false" + tab
+
     feature += "prevNP=" + prev[2] + tab
+    feature += "nextNP=" + next[2] + tab    
     feature += "prevTag=" + prev[1] + tab
     feature += "currTag=" + curr[1] + tab
     feature += "nextTag=" + next[1] + tab
     feature += "prevWord=" + prev[0] + tab
+    feature += "currWord=" + curr[0] + tab
     feature += "nextWord=" + next[0] + tab
     feature += "isCapitalized=" + self.isCapitalWord(curr[0]) + tab
     feature += curr[2]
