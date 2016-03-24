@@ -30,9 +30,9 @@ if __name__ == "__main__":
   fb = FeatureBuilder(sentences)
   fb.buildFeatureVector("WSJ_02-21.feature")
 
-  sentences = readTestCorpus("WSJ_CHUNK_CORPUS_FOR_STUDENTS/WSJ_24.pos")
+  sentences = readTestCorpus("WSJ_CHUNK_CORPUS_FOR_STUDENTS/WSJ_23.pos")
   
   fb = FeatureBuilder(sentences)
-  fb.buildFeatureVector("WSJ_24.feature")
+  fb.buildFeatureVector("WSJ_23.feature")
 
   

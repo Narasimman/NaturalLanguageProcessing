@@ -42,7 +42,6 @@ class FeatureBuilder:
       feature += "firstword=false" + tab
 
     feature += "prevNP=" + self.getFeatureValue(prev[2]) + tab
-    feature += "nextNP=" + self.getFeatureValue(next[2]) + tab    
     feature += "prevTag=" + self.getFeatureValue(prev[1]) + tab
     feature += "currTag=" + curr[1] + tab
     feature += "nextTag=" + self.getFeatureValue(next[1]) + tab
