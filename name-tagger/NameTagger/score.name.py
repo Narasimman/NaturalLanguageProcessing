@@ -27,7 +27,7 @@ def score (keyFileName, responseFileName):
   correctGroupCount = 0
   for i in range(len(key)):
     key[i] = key[i].rstrip('\n')
-    response[i] = response[i].rstrip('\r\n')
+    response[i] = response[i].rstrip('\n')
     if key[i] == "":
       if response[i] == "":
         continue
